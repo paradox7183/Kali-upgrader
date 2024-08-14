@@ -6,18 +6,27 @@ BOLDGREEN="\e[1;${GREEN}m"
 ITALICRED="\e[3;${RED}m"
 ENDCOLOR="\e[0m"
 
-echo -e  "${BOLDGREEN}Updating your kali env!${ENDCOLOR}"
+# Ensure the script is run as root or with sudo
+if [ "$EUID" -ne 0 ]; then 
+  echo -e "${ITALICRED}Please run as root or with sudo!${ENDCOLOR}"
+  exit 1
+fi
+
+echo -e "${BOLDGREEN}Updating your Kali environment!${ENDCOLOR}"
 sudo apt update 
-sudo apt full-upgrade 
-sudo apt dist-upgrade 
+sudo apt full-upgrade -y
+sudo apt dist-upgrade -y
 
-echo -e  "${ITALICRED}Your kali is updated!${ENDCOLOR}"
+echo -e "${ITALICRED}Your Kali is updated!${ENDCOLOR}"
 
-read -p "Do you want to purge your system?(y/n)" Y
-if [  $Y = "y" ]
-then 
-      echo -e  "${ITALICRED}Purging your system${BOLDGREEN}"
-      sudo apt autoremove
-else [ $Y = "n" ]
-        echo "Ok, bye!"
+# Ask the user if they want to purge the system
+read -p "Do you want to purge your system? (y/n): " Y
+Y=${Y,,} # Convert input to lowercase
+if [ "$Y" = "y" ]; then
+    echo -e "${ITALICRED}Purging your system...${ENDCOLOR}"
+    sudo apt autoremove -y
+elif [ "$Y" = "n" ]; then
+    echo "Ok, bye!"
+else
+    echo -e "${ITALICRED}Invalid input. No actions taken.${ENDCOLOR}"
 fi
